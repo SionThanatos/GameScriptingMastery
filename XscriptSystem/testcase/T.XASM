@@ -1,0 +1,366 @@
+; T.XASM
+
+; Source File: T.XSS
+; XSC Version: 0.8
+;   Timestamp: Sat Nov  5 12:27:19 2022
+
+; ---- Directives -----------------------------------------------------------------------------
+
+; ---- Global Variables -----------------------------------------------------------------------
+
+	Var _T0
+	Var _T1
+
+; ---- Functions ------------------------------------------------------------------------------
+
+	Func print
+	{
+		Param s
+
+		;     PrintString(s);
+
+		Push		s
+		CallHost	PrintString
+	}
+
+	Func println
+	{
+		;     PrintNewline();
+
+		CallHost	PrintNewline
+	}
+
+	Func max
+	{
+		Param b
+		Param a
+
+		;     if(a > b)
+
+		Push		a
+		Push		b
+		Pop		_T1
+		Pop		_T0
+		JG		_T0, _T1, _L1
+		Push		0
+		Jmp		_L2
+	_L1:
+		Push		1
+	_L2:
+		Pop		_T0
+		JE		_T0, 0, _L0
+
+		;         return a;
+
+		Push		a
+		Pop		_RetVal
+		Ret
+		Jmp		_L3
+	_L0:
+
+		;         return b;
+
+		Push		b
+		Pop		_RetVal
+		Ret
+	_L3:
+	}
+
+	Func sum
+	{
+		Param b
+		Param a
+
+		;     return a + b;
+
+		Push		a
+		Push		b
+		Pop		_T1
+		Pop		_T0
+		Add		_T0, _T1
+		Push		_T0
+		Pop		_RetVal
+		Ret
+	}
+
+	Func draw_rectangle
+	{
+		Param _y
+		Param _x
+
+		Var x
+		Var y
+		Var is_print
+
+		;     y = 1;
+
+		Push		1
+		Pop		_T0
+		Mov		y, _T0
+
+		;     while(y <= _y)
+
+	_L4:
+		Push		y
+		Push		_y
+		Pop		_T1
+		Pop		_T0
+		JLE		_T0, _T1, _L6
+		Push		0
+		Jmp		_L7
+	_L6:
+		Push		1
+	_L7:
+		Pop		_T0
+		JE		_T0, 0, _L5
+
+		;         x = 1;
+
+		Push		1
+		Pop		_T0
+		Mov		x, _T0
+
+		;         while(x <= _x)
+
+	_L8:
+		Push		x
+		Push		_x
+		Pop		_T1
+		Pop		_T0
+		JLE		_T0, _T1, _L10
+		Push		0
+		Jmp		_L11
+	_L10:
+		Push		1
+	_L11:
+		Pop		_T0
+		JE		_T0, 0, _L9
+
+		;             is_print = false;
+
+		Push		0
+		Pop		_T0
+		Mov		is_print, _T0
+
+		;             if(y == 1)
+
+		Push		y
+		Push		1
+		Pop		_T1
+		Pop		_T0
+		JE		_T0, _T1, _L13
+		Push		0
+		Jmp		_L14
+	_L13:
+		Push		1
+	_L14:
+		Pop		_T0
+		JE		_T0, 0, _L12
+
+		;                 is_print = true;
+
+		Push		1
+		Pop		_T0
+		Mov		is_print, _T0
+	_L12:
+
+		;             if(y == _y)
+
+		Push		y
+		Push		_y
+		Pop		_T1
+		Pop		_T0
+		JE		_T0, _T1, _L16
+		Push		0
+		Jmp		_L17
+	_L16:
+		Push		1
+	_L17:
+		Pop		_T0
+		JE		_T0, 0, _L15
+
+		;                 is_print = true;
+
+		Push		1
+		Pop		_T0
+		Mov		is_print, _T0
+	_L15:
+
+		;             if(x == 1)
+
+		Push		x
+		Push		1
+		Pop		_T1
+		Pop		_T0
+		JE		_T0, _T1, _L19
+		Push		0
+		Jmp		_L20
+	_L19:
+		Push		1
+	_L20:
+		Pop		_T0
+		JE		_T0, 0, _L18
+
+		;                 is_print = true;
+
+		Push		1
+		Pop		_T0
+		Mov		is_print, _T0
+	_L18:
+
+		;             if(x == _x)
+
+		Push		x
+		Push		_x
+		Pop		_T1
+		Pop		_T0
+		JE		_T0, _T1, _L22
+		Push		0
+		Jmp		_L23
+	_L22:
+		Push		1
+	_L23:
+		Pop		_T0
+		JE		_T0, 0, _L21
+
+		;                 is_print = true;
+
+		Push		1
+		Pop		_T0
+		Mov		is_print, _T0
+	_L21:
+
+		;             if(is_print == true)
+
+		Push		is_print
+		Push		1
+		Pop		_T1
+		Pop		_T0
+		JE		_T0, _T1, _L25
+		Push		0
+		Jmp		_L26
+	_L25:
+		Push		1
+	_L26:
+		Pop		_T0
+		JE		_T0, 0, _L24
+
+		;                 print("*");
+
+		Push		"*"
+		Call		print
+		Jmp		_L27
+	_L24:
+
+		;                 print(" ");
+
+		Push		" "
+		Call		print
+	_L27:
+
+		;             x += 1;
+
+		Push		1
+		Pop		_T0
+		Add		x, _T0
+		Jmp		_L8
+	_L9:
+
+		;         println();
+
+		Call		println
+
+		;         y += 1;
+
+		Push		1
+		Pop		_T0
+		Add		y, _T0
+		Jmp		_L4
+	_L5:
+	}
+
+; ---- Main -----------------------------------------------------------------------------------
+
+	Func _Main
+	{
+		Var a
+		Var b
+		Var c
+		Var s
+
+		;     draw_rectangle(20, 10);
+
+		Push		20
+		Push		10
+		Call		draw_rectangle
+
+		;     print("Hello World~!");
+
+		Push		"Hello World~!"
+		Call		print
+
+		;     println();
+
+		Call		println
+
+		;     a = 1;
+
+		Push		1
+		Pop		_T0
+		Mov		a, _T0
+
+		;     b = 100;
+
+		Push		100
+		Pop		_T0
+		Mov		b, _T0
+
+		;     c = max(a, b);
+
+		Push		a
+		Push		b
+		Call		max
+		Push		_RetVal
+		Pop		_T0
+		Mov		c, _T0
+
+		;     s = "The maximum between a=" $ a $ " and b=" $ b $ " is " $ c;
+
+		Push		"The maximum between a="
+		Push		a
+		Pop		_T1
+		Pop		_T0
+		Concat		_T0, _T1
+		Push		_T0
+		Push		" and b="
+		Pop		_T1
+		Pop		_T0
+		Concat		_T0, _T1
+		Push		_T0
+		Push		b
+		Pop		_T1
+		Pop		_T0
+		Concat		_T0, _T1
+		Push		_T0
+		Push		" is "
+		Pop		_T1
+		Pop		_T0
+		Concat		_T0, _T1
+		Push		_T0
+		Push		c
+		Pop		_T1
+		Pop		_T0
+		Concat		_T0, _T1
+		Push		_T0
+		Pop		_T0
+		Mov		s, _T0
+
+		;     print(s);
+
+		Push		s
+		Call		print
+
+		;     println();
+
+		Call		println
+	}

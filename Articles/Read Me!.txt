@@ -1,0 +1,16 @@
+ARTICLES
+
+GAME SCRIPTING MASTERY
+-----------------------------------------------------------------------------------------------
+
+	Here you'll find a number of articles from various sources outlining topics related
+	to scripting in game development. Each article is in HTML format, and resides in its
+	own directory along with any image or source files it may need. Articles always begin
+	with page_1.html.
+
+-----------------------------------------------------------------------------------------------
+
+Have fun!
+
+-- Alex
+   alex@amvbooks.com

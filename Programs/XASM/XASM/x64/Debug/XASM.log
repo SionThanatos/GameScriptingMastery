@@ -1,0 +1,8 @@
+﻿  xasm.cpp
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XASM\XASM\xasm.cpp(757,49): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XASM\XASM\xasm.cpp(1014,68): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XASM\XASM\xasm.cpp(3489,49): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XASM\XASM\xasm.cpp(3534,49): warning C4267: “初始化”: 从“size_t”转换到“char”，可能丢失数据
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XASM\XASM\xasm.cpp(3563,60): warning C4267: “初始化”: 从“size_t”转换到“char”，可能丢失数据
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XASM\XASM\xasm.cpp(3731,17): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+  XASM.vcxproj -> C:\Users\ZAI\Desktop\GameScriptingMastery-master\XscriptSystem\x64\Debug\XASM.exe

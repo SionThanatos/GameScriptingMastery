@@ -1,0 +1,16 @@
+﻿  code_emit.cpp
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XscriptCompiler\XscriptCompiler\code_emit.cpp(226,52): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  error.cpp
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XscriptCompiler\XscriptCompiler\error.cpp(54,49): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  func_table.cpp
+  i_code.cpp
+  lexer.cpp
+  linked_list.cpp
+  parser.cpp
+  preprocessor.cpp
+  stack.cpp
+  symbol_table.cpp
+  xsc.cpp
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XscriptCompiler\XscriptCompiler\xsc.cpp(136,17): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+  正在生成代码...
+  XscriptCompiler.vcxproj -> C:\Users\ZAI\Desktop\GameScriptingMastery-master\XscriptSystem\x64\Debug\XscriptCompiler.exe

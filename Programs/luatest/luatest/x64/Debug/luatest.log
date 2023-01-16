@@ -1,0 +1,7 @@
+﻿  luademo.cpp
+luademo.obj : error LNK2019: 无法解析的外部符号 lua_close，函数 main 中引用了该符号
+luademo.obj : error LNK2019: 无法解析的外部符号 lua_pcallk，函数 main 中引用了该符号
+luademo.obj : error LNK2019: 无法解析的外部符号 luaL_openlibs，函数 main 中引用了该符号
+luademo.obj : error LNK2019: 无法解析的外部符号 luaL_loadfilex，函数 main 中引用了该符号
+luademo.obj : error LNK2019: 无法解析的外部符号 luaL_newstate，函数 main 中引用了该符号
+C:\Users\ZAI\Desktop\luatest\x64\Debug\luatest.exe : fatal error LNK1120: 5 个无法解析的外部命令

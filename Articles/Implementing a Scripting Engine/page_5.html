@@ -1,0 +1,212 @@
+<HTML>
+
+	<Head>
+		<Title>
+			Implementing a Scripting Engine
+		</Title>
+		<Link Rel="Stylesheet" Type="text/css" HRef="article.css">
+	</Head>
+
+	<Body>
+
+		<P>
+
+		<Center>
+		<H1>Implementing a Scripting Engine</H1>
+		<B><I>by Jan Niestadt</I></B><Br>
+		This article originally appeared on <A HRef="http://www.flipcode.com/">Flipcode</A>.
+		</Center>
+		<Br>
+
+		<H2>Part 5: The Semantic Checker & Intermediate Code Generator</H2>
+
+		<H3>Introduction</H3>
+
+		A little late this time.. Exams are horrible things, they really interfere with useful stuff.<Br>
+		<Br>
+
+		Right, last time I promised results and you're gonna get 'em. More than you wished for, probably ;-).<Br>
+		<Br>
+
+		But first a general remark about these tutorials. I have a tendency to write very compact explanations. The information is all there, but often there are two important facts per sentence.. The disadvantage of this is that if something is not clear, you probably can't follow the rest of the tutorial. Please tell me when I'm going too fast so I can clear things up.<Br>
+		<Br>
+
+		Back to this part. It's about semantics and intermediate code. Checking the semantics will make sure that our program is really correct, and the intermediate code will be a giant leap towards a virtual executable.<Br>
+		<Br>
+
+		Let's get checking!<Br>
+		<Br>
+
+		<H3>Checking the Semantics</H3>
+
+		Semantic checking is done to make sure that not only the syntax of the program is correct, but the statements also make sense. The number of parameters supplied to a function, for example, should be the number this function expects.<Br>
+		<Br>
+
+		The major part of semantic checking is type checking: determining the types of expressions and reporting any inconsistencies, like trying to compare a boolean to a string or passing the wrong type of argument to a function.<Br>
+		<Br>
+
+		Of course you may want to allow some of these 'inconsistencies'; for example when someone uses the following statement
+
+		<Code>
+<Pre>print "a and b equal: " + (a == b);</Pre>
+		</Code>
+
+		he probably means that the expression (a == b) should be converted to a string automatically, resulting in the string "true" or "false". This is called a coercion. In our sample compiler I've only allowed bool to string coercion, but you could easily add string to bool coercion if you think that's useful.<Br>
+		<Br>
+
+		The code for our semantic checker is not complicated. I've added a member function to TreeNode called Check() (in synttree.cpp) that checks a node's semantics, assuming that all its children have already been checked. Check() is automatically called from the TreeNode constructors, so that's a safe assumption.<Br>
+		<Br>
+
+		Check sets a new member variable called rettype, the 'return type' of the expression. A condition, for example, has boolean as its return type, while a string concatenation returns another string. Rettype is used to check the semantics of the parent node. The function CoerceToString is used to coerce any expression to string type (if it isn't already) by inserting a new node, COERCE_TO_STR, as the new parent of the node to be coerced.<Br>
+		<Br>
+
+		For a simple compiler this is easy, but generally it's not. If your language includes more base types, references, arrays, classes and (operator) overloading things get ugly real fast; you'd better have a solid type checking system if you ever want your program to run.<Br>
+		<Br>
+
+		In a real compiler a lot of the work goes into this: there are more coercions, you have to figure out which of the overloaded functions must be used, type equivalence isn't so trivial anymore, etc.<Br>
+		<Br>
+
+		So yes, in this case it's simple, and it's a useful learning experience to try to expand this system with some more types, but at some point you'll want to take a more general approach.<Br>
+		<Br>
+
+		The rest of the code pretty much explains itself. It just enforces simple things like: if-conditions should be boolean, assignment expressions should be strings, etc. <Br>
+
+		<H3>Generating Intermediate Code</H3>
+
+		Intermediate code is a sort of graph representation of your program: every instruction has a pointer to the next instruction, and jumps have a pointer to their target instructions.<Br>
+		<Br>
+
+		I can think of two advantages of doing it this way (with pointers) instead of immediately generating code into a big array. First, because of the pointer-representation, it's easy to concatenate pieces of code together, and even cutting some instructions can be done without having to update all the jumps, etc. So optimization is relatively easy to do. Second, if you want to change some instructions on your virtual machine it's easier to adapt your compiler to the new VM because you only have to change the translation step from intermediate to final code, which is relatively easy.<Br>
+		<Br>
+
+		So, with all that in mind, we design our intermediate code language. The opcodes in this language will be very similar if not identical to the ones our virtual machine will execute. Have a look at them:<Br>
+		<Br>
+
+		<Code>
+<Pre>enum Opcode  {
+   OP_NOP,           // no operation
+   OP_PUSH,          // push string [var]
+   OP_GETTOP,        // get string from top of stack (=assign) [var]
+   OP_DISCARD,       // discard top value from the stack
+   OP_PRINT,         // print a string
+   OP_INPUT,         // input a string [var]
+   OP_JMP,           // unconditional jump [dest]
+   OP_JMPF,          // jump if false [dest]
+   OP_STR_EQUAL,     // test whether two strings are equal
+   OP_BOOL_EQUAL,    // test whether two bools are equal
+   OP_CONCAT,        // concatenate two strings
+   OP_BOOL2STR,      // convert bool to string
+   JUMPTARGET        // not an opcode but a jump target;
+					 // the target field points to the jump instruction
+};</Pre>
+		</Code>
+
+		You can see our VM is going to be a stack machine: opcodes will operate on values from the stack and will put values back on the stack. I think this is the simplest type of machine, both to generate code for and to execute code on.<Br>
+		<Br>
+
+		One note about the JUMPTARGET "opcode": whenever we have a (conditional) jump in our code, it points not to the actual target instruction, but to a prefixed "JUMPTARGET" instruction. The reason for this is that when we optimize we have to know every jump target point in the code, or we might optimize a target instruction away and mess up our program. The JUMPTARGETs won't be in our final bytecode.<Br>
+		<Br>
+
+		In general, all opcodes operate on items on top of the stack. So OP_STR_EQUAL pops the top two items off the stack (these must be strings), checks if they're equal, and pushes the resulting boolean on the stack. Your program can then use the OP_JMPF instruction to react to that result: it jumps to the target instruction (which IS supplied with the instruction, not on the stack) if the boolean on top of the stack is false and continues execution is it's true.<Br>
+		<Br>
+
+		The instructions are stored in a very simple intermediate instruction class, which just stores the opcode, a 'symbol'-operand (e.g. for OP_INPUT) and a jump target instruction if applicable, a next instruction pointer and a line number. The line number is actually just so we can make the code human-readable with the Show() function.<Br>
+		<Br>
+
+		Now, let's look at how we generate the intermediate code (intcode.cpp). Generally we just recursively generate code for all subtrees in the syntax tree. So main calls the GenIntCode() function with the root of the tree; GenIntCode then takes care of the rest and returns a pointer to the beginning of the intermediate code.<Br>
+		<Br>
+
+		First a simple case, the INPUT_STMT node:<Br>
+		<Br>
+
+		<Code>
+<Pre>case INPUT_STMT:
+	return new IntInstr (OP_INPUT, root->symbol);</Pre>
+   		</Code>
+
+		This just generates a new OP_INPUT instruction and returns it. Note that this instruction is also a "block of instructions" of length 1 (the next pointer is set to NULL by default).
+
+		The PRINT_STMT is a little harder:
+
+		<Code>
+<Pre>case PRINT_STMT:
+	blk1 = GenIntCode (root->child[0]);
+	blk2 = new IntInstr (OP_PRINT);
+	return Concatenate (blk1, blk2);</Pre>
+		</Code>
+
+		First we generate the code that evaluates the expression supplied to the print statement (root->child[0]). Then we create a new instruction OP_PRINT that prints the string on top of the stack. Note that we assume the expression leaves its value on top of the stack. We'll have to make sure of this ourselves, of course. Finally we concatenate the two block of instructions and return the result.<Br>
+		<Br>
+
+		Now a really hard one: the IFTHEN_STMT. I just generate the blocks needed for this, and then concatenate them all together. The approach is to check the condition, jump to the end if it's false, and execute the then-part if it's true.<Br>
+		<Br>
+
+		<Code>
+<Pre>case IFTHEN_STMT:
+	// First, create the necessary code parts
+	cond      = GenIntCode (root->child[0]);
+	jump2end  = new IntInstr (OP_JMPF);      // set target below
+	thenpart  = GenIntCode (root->child[1]);
+	endif     = new IntInstr (JUMPTARGET, jump2end);
+	jump2end->target = endif;
+
+	// Now, concatenate them all
+	Concatenate (cond, jump2end);
+	Concatenate (jump2end, thenpart);
+	Concatenate (thenpart, endif);
+	return cond;</Pre>
+   		</Code>
+
+		Remember that root->child[0] is the condition-subtree and root->child[1] the then-subtree.<Br>
+		<Br>
+
+		Well, if that was understandable, you won't have a problem with the rest of the code. All tree nodes are translated in this way. The Show() function just shows the code we've generated. Have a look at what all this does:<Br>
+		<Br>
+
+		<Code>
+<Pre>Program:
+    if (a==b)  a; else b;
+
+Intermediate code:
+    1: OP_NOP
+    2: OP_PUSH a
+    3: OP_PUSH b
+    4: OP_STR_EQUAL
+    5: OP_JMPF 9
+    6: OP_PUSH a
+    7: OP_DISCARD
+    8: OP_JMP 12
+    9: JUMPTARGET 5
+   10: OP_PUSH b
+   11: OP_DISCARD
+   12: JUMPTARGET 8</Pre>
+	   	</Code>
+
+		That looks an awful lot like assembly code, doesn't it? Well, that's because it is. It's Virtual Assembly, and essentially we only need to write an assembler program to generate a Virtual Executable.<Br>
+		<Br>
+
+		<H3>Whoa, what happened?</H3>
+
+		That went fast, didn't it? One moment we're wondering if we're ever going to do something interesting, and suddenly we have generated virtual assembly code! We're almost done!<Br>
+		<Br>
+
+		Well, not quite. Next time we're gonna look at some optimizations (I'm sure you can think of some if you look at the some of the output from this part). And soon, we'll produce actual virtual machine code - but I guess we'd better have a virtual machine first! We'll see where we go from there. You're welcome to send me any ideas or suggestions about what direction to explore.<Br>
+		<Br>
+
+		Bottom line: some interesting stuff is coming up. Stay tuned!<Br>
+		<Br>
+
+		See you next time.<Br>
+		<Br>
+
+		<HR Width=100%>
+		<Br>
+
+		<A HRef="page_6.html">Next: <I>Optimization </I></A><Br>
+		<A HRef="page_4.html">Prev: <I>The Symbol Table & Syntax Tree</I></A>
+
+		</P>
+
+	</Body>
+
+</HTML>

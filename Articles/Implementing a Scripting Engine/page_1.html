@@ -1,0 +1,120 @@
+<HTML>
+
+	<Head>
+		<Title>
+			Implementing a Scripting Engine
+		</Title>
+		<Link Rel="Stylesheet" Type="text/css" HRef="article.css">
+	</Head>
+
+	<Body>
+
+		<P>
+
+		<Center>
+		<H1>Implementing a Scripting Engine</H1>
+		<B><I>by Jan Niestadt</I></B><Br>
+		This article originally appeared on <A HRef="http://www.flipcode.com/">Flipcode</A>.
+		</Center>
+		<Br>
+
+		<H2>Part 1: Overview</H2>
+
+		<H3>Introduction</H3>
+
+		Okay. You want a scripting language for your engine. Why? Because they're just really cool, and everybody has 'em these days.<Br>
+		<Br>
+
+		First, decide what kind of scripting you want; Henry Robinson already wrote an introduction to the different kinds scripting (be sure to read it if you haven't already). In this tutorial series, I'll be talking about a compiler / virtual machine system like UnrealScript.<Br>
+		<Br>
+
+		Next, you need to know two things: how to implement such a scripting engine, and some reasons why a scripting engine is not only cool but actually useful.<Br>
+		<Br>
+
+		Here's what I made up:<Br>
+		<Br>
+
+		<UL>
+		<LI>Useful new language features like states, latent code, etc.</LI>
+		<LI>A sandbox environment that can't crash the game engine</LI>
+		<LI>Being able to create game content without knowledge of the engine internals and without having to recompile the engine</LI>
+		<LI>Fully platform-independent script code</LI>
+		</UL>
+
+		However, there are also drawbacks:<Br>
+		<Br>
+
+		<UL>
+		<LI>Relatively slow - scripts run at least 15 times slower than executable code</LI>
+		<LI>Limiting - scripts can't be used to create entirely new visual effects (partly because of the lack of speed).</LI>
+		<LI>People creating game content have to learn a new language</LI>
+		</UL>
+
+		Of course, we don't let those stop us; we had already made up our minds. Now, where to start?<Br>
+		<Br>
+
+		<H3>Required Reading</H3>
+
+		I started when Unreal hadn't been released for very long. I was browsing their tech site and found the UnrealScript reference document. I had heard of UnrealScript of course, but didn't really know what it was. I read the document and thought the idea of a script language was really cool. I wanted to write my own, and link it to a game engine so that the whole world could easily create new content for my game.<Br>
+		<Br>
+
+		Fortunately, I got a class in Compiler Construction that semester, and as a practical assignment we had to implement a VERY simple Pascal compiler. I started working in parallel (OK, semi-parallel) on my own, better, compiler. I already had a "working" version which accepted a small subset of C, but I coded it in about 2 weeks, and the internal structure was pretty awful.. I had to completely redesign the whole thing. I'm sure you've had a similar experience at some point in your life.. So I'm still working on this, and learning a lot about compilers while doing it.<Br>
+		<Br>
+
+		But, let's get to a little useful info.<Br>
+		<Br>
+
+		First of all, I advise anyone who's going to program a compiler to get the Dragon book. Most of you (especially CS students like me) probably know this one already. For those who don't, I'm talking about <I>Compilers - Principles, Techniques and Tools</I> by Aho, Sethi and Ullman (ISBN 0-201-10194-7). It has a picture of a dragon on the front, hence the name "Dragon book". Believe me, anyone who knows anything about compilers has read this book.<Br>
+		<Br>
+
+		The book hasn't changed since 1986; this is because the underlying techniques of compiler design practically haven't changed since the 1960's. Of course, this book doesn't cover processor-specific optimizations, but there are other books for that. Besides, we want to compile to bytecode, not machine code.<Br>
+		<Br>
+
+		Second, if you're looking for a quick overview of implementing a bytecode script language, check out this <A HRef="http://www.gamasutra.com/features/programming/100397/languages1.htm">article</A> on GamaSutra, which is a very readable story of how the Jedi Knight script language was implemented. I'll cover everything that's in there too, but it's still an interesting read.<Br>
+		<Br>
+
+		<H3>What We Need</H3>
+
+		Basically a compiler consists of the following components:<Br>
+		<Br>
+
+		<UL>
+		<LI>A symbol table, which contains all the symbols and information about type, scope, etc.</LI>
+		<LI>A lexical analyzer, which is a function that converts a character stream (i.e. the source file) into tokens (i.e. keywords, operators, etc.)</LI>
+		<LI>A parser, which takes the token stream and builds a syntax tree from it.</LI>
+		<LI>A semantic checker, which checks the syntax tree for semantic errors</LI>
+		<LI>An itermediate code generator, which converts the syntax tree into intermediate code</LI>
+		<LI>An optimizer (optional) which optimizes the intermediate code</LI>
+		<LI>A code generator, which generates bytecode from the intermediate code</LI>
+		<LI>Last but not least, the virtual machine on which the bytecode is to be executed.</LI>
+		</UL>
+
+		<Center>
+		<Img Src="layout.jpg" Border=0><Br>
+		</Center>
+		<Br>
+
+		If you have programmed all these components, together they will form a complete scripting system.<Br>
+		<Br>
+
+		<H3>Is That All?</H3>
+
+		Feeling a little overwhelmed? About to decide that maybe scripting isn't so cool after all and DLL's are really the only way to go? No need; I will be talking about each of the components in detail soon and most of them aren't really that hard. Creating a complete scripting engine *is* a lot of work, though, and structuring your code is essential.<Br>
+		<Br>
+
+		In the remaining parts of this tutorial we will develop a very simple compiler / virtual machine system. It will be nowhere near a full scripting language, but it will implement all the components listed above. I'm thinking about a simple language to manipulate strings.<Br>
+		<Br>
+
+		For now, just check out the links and let the above sink in. All comments are greatly appreciated by the way! <Br>
+		<Br>
+
+		<HR Width=100%>
+		<Br>
+
+		<A HRef="page_2.html">Next: <I>The Lexical Analyzer</I></A>
+
+		</P>
+
+	</Body>
+
+</HTML>

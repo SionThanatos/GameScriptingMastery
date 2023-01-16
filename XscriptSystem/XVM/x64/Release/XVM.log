@@ -1,0 +1,9 @@
+﻿  host.cpp
+  xvm.cpp
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XscriptSystem\XVM\xvm.cpp(1294,84): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XscriptSystem\XVM\xvm.cpp(2425,23): warning C4244: “return”: 从“ULONGLONG”转换到“int”，可能丢失数据
+  正在生成代码
+  Previous IPDB not found, fall back to full compilation.
+  All 47 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  已完成代码的生成
+  XVM.vcxproj -> C:\Users\ZAI\Desktop\GameScriptingMastery-master\XscriptSystem\x64\Release\XVM.exe

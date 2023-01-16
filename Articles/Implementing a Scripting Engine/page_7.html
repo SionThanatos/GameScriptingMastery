@@ -1,0 +1,96 @@
+<HTML>
+
+	<Head>
+		<Title>
+			Implementing a Scripting Engine
+		</Title>
+		<Link Rel="Stylesheet" Type="text/css" HRef="article.css">
+	</Head>
+
+	<Body>
+
+		<P>
+
+		<Center>
+		<H1>Implementing a Scripting Engine</H1>
+		<B><I>by Jan Niestadt</I></B><Br>
+		This article originally appeared on <A HRef="http://www.flipcode.com/">Flipcode</A>.
+		</Center>
+		<Br>
+
+		<H2>Part 7: The Virtual Machine</H2>
+
+		<H3>Introduction</H3>
+
+		We've generated intermediate code in part 5 and we would like to convert it to executable code so we can execute a program. But I've decided to create the virtual machine first, so we know what we're dealing with when generating the executable.<Br>
+		<Br>
+
+		The virtual machine is of course a very important component of a scripting engine. It's where the code is executed at runtime, so it had better be fast. I won't focus on speed this time though.<Br>
+		<Br>
+
+		Oh yeah: you get my Amazing Stack Template absolutely FREE with this part, No Extra Charge! AND you get a cool string class that was written especially for this part, with at least 5 minutes work in it! Now that's real value for your money!<Br>
+		<Br>
+
+		But first, an explanation of different machine types. In tut 5 I just said what kind our VM would be, without explaining what other possibilities there were. Andy Campbell asked me about these other possibilites, and I figured other people might be interested, so here goes:<Br>
+		<Br>
+
+		<H3>Machine Types</H3>
+
+		As said, our machine will be a stack machine. In real machines, stack CPUs were used for early computers (and may still used in simple devices today). The disadvantage is the many stack manipulations needed: a PUSH for every operand and a POP for every result. Often, though, you use the results directly for the next calculation so that's not always necessary.<Br>
+		<Br>
+
+		Most CPUs nowadays have registers (a very limited number of very fast memory locations) it operates on instead of just a stack; a stack is still used for passing parameters to functions. Machines that can only operate on registers are called load/store machines since you have to load each value before you use it and store each result after you calculate it.<Br>
+		<Br>
+
+		Some processors only operate on memory data; no stack and no registers are used. Machines with this type of processor are called three-address machines because most instructions have three address operands (i.e. ADD dest, src1, src2). I don't think they're used much in hardware because of the limited memory bandwidth, but they ARE a viable option for virtual machines.<Br>
+		<Br>
+
+		For virtual machines, the stack machine is very easy to implement because you don't need temporary variables to store intermediate results when calculating an expression; you put everything on the stack (it's very similar to the way you process a postfix expression). We WILL use temporaries here though, because I didn't want to have to stack pointers. But more about that later.<Br>
+		<Br>
+
+		It is not clear to me whether three-address machines might have an advantage; speed would be the most important one, and although I've tried both I can't say for certain which does fewer calculations in the most optimized case.. I do think it's easier to optimize three-address code, so that may give this type of machine an advantage.<Br>
+		<Br>
+
+		Java apparently uses a stack machine (I'm not familiar with the Java VM but I've heard this).<Br>
+		<Br>
+
+		<H3>A Virtual Piece of Cake</H3>
+
+		Our virtual machine object isn't complicated at all. Its most important members are: an instruction array, a string table and a stack. It has three main interface functions: Reset, Read and Execute.<Br>
+		<Br>
+
+		The instruction array contains the instructions that comprise our program. The instruction class is extremely simple and looks like the one we used for intermediate code in tut 5.<Br>
+		<Br>
+
+		The string table is just an array of pointers that can either be NULL or point to a string that's currently in use. This might be a program variable, or a temporary variable on the stack.<Br>
+		<Br>
+
+		Our stack is made up of integers. They point to the string table so we know what string is actually on the stack. Why did I use integers and not just pointers to the string class? Because I wanted to keep things simple (for the readers, but also for myself :-): remember that we also want to stack booleans sometimes, so we would have to create a 'stack item'-class that could contain a string pointer or a boolean.. Now we just have an integer: if it's non-negative, we know it points to a string, and if it's negative it's a boolean. It's dirty coding, but it does the job and everyone can understand it. Don't try this at home. Or rather, don't do this on a real project.<Br>
+		<Br>
+
+		Now, the interface functions. 'Reset' reinitializes the virtual machine. It's a pathetically simple function.<Br>
+		<Br>
+
+		'Read' should read in the program. Next time we'll change this function so it reads from stdin, but for now it's got a test program hardcoded into it. Change it if you like - just be very careful that the program stays correct, 'cause our VM does not crash gracefully.<Br>
+		<Br>
+
+		'Execute' runs the program currently in memory. This is also a simple function: it has an instruction pointer, it looks at an instruction and executes the right code using a switch statement. A little note about the temporary variables: whenever we put a variable on the stack, we need to have a copy of it: we can't just push the variable's index in the string table, because its value might change and then the value on the stack would also change. This is why, for almost every stack operation, NewTempCopy and DelTempCopy are used.<Br>
+		<Br>
+
+		Some little notes on optimizing the VM: We should make sure our stack manipulation is as fast as possible; my stack template is not especially fast. The same goes for string manipulations. In general, you should make the common case fast. All normal optimization techniques apply on VMs as well.<Br>
+		<Br>
+
+		There's more to say on virtual machines: allocation schemes, garbage collection, keeping them both stable and fast, but I think I'll delay that till one of the next parts.<Br>
+		<Br>
+
+		<HR Width=100%>
+		<Br>
+
+		<A HRef="page_8.html">Next: <I>Executable Code</I></A><Br>
+		<A HRef="page_6.html">Prev: <I>Optimization</I></A>
+
+		</P>
+
+	</Body>
+
+</HTML>

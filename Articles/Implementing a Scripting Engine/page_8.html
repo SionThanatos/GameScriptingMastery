@@ -1,0 +1,76 @@
+<HTML>
+
+	<Head>
+		<Title>
+			Implementing a Scripting Engine
+		</Title>
+		<Link Rel="Stylesheet" Type="text/css" HRef="article.css">
+	</Head>
+
+	<Body>
+
+		<P>
+
+		<Center>
+		<H1>Implementing a Scripting Engine</H1>
+		<B><I>by Jan Niestadt</I></B><Br>
+		This article originally appeared on <A HRef="http://www.flipcode.com/">Flipcode</A>.
+		</Center>
+		<Br>
+
+		<H2>Part 8: Executable Code</H2>
+
+		<H3>Introduction</H3>
+
+		We have everything we need in order to execute our program, except.. executable code. We do have intermediate code and it's already very close to the stuff our virtual machine understands. So all we have to do is a quick translation step between intermediate and executable code.<Br>
+		<Br>
+
+		Why was this separate step necessary again? As you will see, the "translation" really comes down to putting our strings in an array and referring to them as indices instead of pointers to the symbol table. We already did jump targets last time, so they won't change anymore. So this is a short part and the code changes aren't big.<Br>
+		<Br>
+
+		Maybe it wasn't strictly necessary for us to create intermediate code. But when writing a more advanced compiler it's useful to have a separate, more 'conceptual' stage before the actual machine code: it makes it easier to optimize the code, and you can retarget your compiler to another machine without much difficulties.<Br>
+		<Br>
+
+		<H3>The Final Step</H3>
+
+		As you read the code for this part you'll notice my extreme laziness took control at some point and made me write really evil code..<Br>
+		<Br>
+
+		For example, I've combined the compiler and virtual machine into one program and I'm passing the *intermediate* code to the virtual machine, which isn't the proper way of doing things. You'll probably want your compiler to handle everything up to the executable generation, then maybe store the executable in a file and have your VM read & execute that file.<Br>
+		<Br>
+
+		In our case, the Read() function in VMachine first gets all the strings from our symbol table and puts it in its string array. Then it walks through the code in a linear way and 'translates' it line by line. The special jump target instructions we used are just converted to NOP instructions, which should really be optimized away.<Br>
+		<Br>
+
+		Oh, one particularly disgusting thing I did was store the string table index from the virtual machine in the symbol table from the compiler (using the symbol table's new PutNo()/GetNo() members).. It's a very easy way to find the string index later, but you'll agree that modular programming is something entirely different..<Br>
+		<Br>
+
+		<H3>It works! I can't believe it!</H3>
+
+		Hey, you can actually run a program now with the compiler/virtual machine combination! You probably nearly gave up on that, didn't you? Well, go ahead and try example.str on it, or ex2.str provided with this part's source download.. They should execute correctly. Is that fun or what?<Br>
+		<Br>
+
+		Well, that's what we've been working for all this time. A tiny language that, while it isn't useful in itself, represents something very cool - you now know enough to write your own simple scripting engine!<Br>
+
+		<H3>So what happens now?</H3>
+
+		Well, after such an incredible climax (ahem) I'm sure you feel a bit empty and bewildered. Where do we go from here?<Br>
+		<Br>
+
+		I will probably do one more part about some more advanced subjects, maybe talking about adding functions, classes, polymorphism, etc. to the language. Let me know what you're interested in.<Br>
+		<Br>
+
+		There won't be any supporting code anymore though - everyone should be able to take the example compiler and expand it. Or, much better, write your own from scratch and get it right. The world's your oyster!<Br>
+		<Br>
+
+		<HR Width=100%>
+		<Br>
+
+		<A HRef="page_9.html">Next: <I>Advanced Subjects</I></A><Br>
+		<A HRef="page_7.html">Prev: <I>The Virtual Machine</I></A>
+
+		</P>
+
+	</Body>
+
+</HTML>

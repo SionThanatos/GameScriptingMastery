@@ -1,0 +1,229 @@
+<HTML>
+
+	<Head>
+		<Title>
+			Implementing a Scripting Engine
+		</Title>
+		<Link Rel="Stylesheet" Type="text/css" HRef="article.css">
+	</Head>
+
+	<Body>
+
+		<P>
+
+		<Center>
+		<H1>Implementing a Scripting Engine</H1>
+		<B><I>by Jan Niestadt</I></B><Br>
+		This article originally appeared on <A HRef="http://www.flipcode.com/">Flipcode</A>.
+		</Center>
+		<Br>
+
+		<H2>Part 3: The Parser</H2>
+
+		<H3>Introduction</H3>
+
+		The executable from the previous part did a nice job converting programs to tokens. All keywords, operators, punctuators, identifiers and constants were immediately recognized and reported. However, you could type<Br>
+		<Br>
+
+		<Code>{ this ) = "pointless" + ;</Code><Br>
+		<Br>
+
+		and the program would just accept it and happily produce a list of tokens. Since this is clearly not something we want to allow (I have no idea what the above 'statement' should do), we have to be able to recognize syntax structures (or lack thereof) in the input program.<Br>
+		<Br>
+
+		We do this by means of the parser, which finds the structure of the program and checks for any syntax errors.<Br>
+		<Br>
+
+		<H3>A Little Language Theory</H3>
+
+		How can we tell the parser what our language looks like? Well, we can use a way of specifying syntax (or "grammar") called Backus-Naur Form (BNF). This method of specification uses the basic concepts that a program is made up of. For example, expressions can be, among other things, identifiers or string constants. In BNF, this is written as follows:<Br>
+
+		<Code>
+<Pre>expression: identifier | string;</Pre>
+		</Code>
+
+		A statement can be a print or an input statement:<Br>
+		<Br>
+
+		<Code>
+<Pre>statement
+   : PRINT expression END_STMT
+   | INPUT identifier END_STMT
+   ;</Pre>
+	   </Code>
+
+		(remember that PRINT, INPUT and END_STMT were tokens returned by our lexer)<Br>
+		<Br>
+
+		Now, a program can be expressed as being a list of statements in the following way:
+
+		<Code>
+<Pre>program: | program statement;</Pre>
+		</Code>
+
+		which says that a program is either empty or a program followed by one statement, which is a nice recursive definition of a list of statements.<Br>
+		<Br>
+
+		So, the language we've defined in BNF includes the statements:<Br>
+		<Br>
+
+<Code>
+<Pre>print a;
+print "Hello";
+input name;</Pre>
+</Code>
+
+		Not legal is:<Br>
+		<Br>
+
+		<Code>
+<Pre>input "Hello";</Pre>
+		</Code>
+
+		because we've defined the input statement so it can only take an identifier, not a string constant.<Br>
+		<Br>
+
+		With the use of BNF, we can formally specify the whole syntax of our language. Note that this does not include semantics yet, so the statement<Br>
+		<Br>
+
+		<Code>
+<Pre>a = (b == c);</Pre>
+		</Code>
+
+		will be accepted by the parser even though it doesn't make sense (we're trying to assign a boolean value to a string variable). Semantics are checked at a later stage.<Br>
+		<Br>
+
+		Great, we now know enough about language specifications to create our parser!<Br>
+		<Br>
+
+		<H3>Looks Familliar!</H3>
+
+		The parser is also generated using an external program. This one is called Yacc (a standard Unix tool, just like Lex); we'll be using an improved version called Bison (get it?). The Bison manual can again be found <A HRef="http://www.monmouth.com/~wstreett/lex-yacc/lex-yacc.html">here</A>. The layout of a Yacc file (extension .y) is in fact very similar to that of a Lex file:<Br>
+		<Br>
+
+		<Code>
+<Pre>&lt;definitions&gt;
+%%
+&lt;rules&gt;
+%%
+&lt;user_code&gt;</Pre>
+		</Code>
+
+		The <definitions> section contains token definitions, type information, and the definition of the yylval union we saw in the previous part. That's why we used a union: Yacc uses this same union to pass information between the different 'language concepts' like expression, statement, and program. From these definitions, Yacc generates the lexsymb.h file for us (actually it creates parse.cpp.h but the parser.bat procedure renames it).<Br>
+		<Br>
+
+		Again, just like a Lex file, this section may contain some initial code between the tags %{ and %}. The section is not yet used in this part, but can also contain any additional code you need.<Br>
+		<Br>
+
+		The rules are specified in Backus-Naur Form as explained in the previous section.<Br>
+		<Br>
+
+		There is a nasty catch to using Yacc, though, and it's that your language specification has to be LR(1)... What exactly that means is explained extensively in the Dragon book (section 4.5 about bottom-up parsing), but basically the parser has to be able to tell what kind of syntax rule to use by looking at the current lexer token and not more than ONE token ahead. The following rule would generate a shift/reduce conflict:<Br>
+		<Br>
+
+		<Code>
+<Pre>A:
+   | B C
+   | B C D
+   | D E F
+   ;</Pre>
+   		</Code>
+
+		The conflict would not arise when reading 'B' from the input file and looking ahead to 'C' as you may think, because these can be grouped (both of these alternatives will generate an A symbol eventually); the problem is that the second alternative ends with 'D', and the third begins with it: when the parser has read 'C' and looks ahead to 'D', it can't decide whether to classify this as A2 or as A1 followed by a A3! So although the complete syntax definition may not be ambiguous at all, to the parser it *is* because it can only look ahead ONE token. Yacc will call this semi-ambiguity a shift/reduce or reduce/reduce conflict.<Br>
+		<Br>
+
+		Well, don't let all of that scare you. Have a look at the rules. The most important one is perhaps the statement rule:<Br>
+		<Br>
+
+		<Code>
+<Pre>statement
+      : END_STMT                    {puts ("Empty statement");}
+      | expression END_STMT         {puts ("Expression statement");}
+      | PRINT expression END_STMT   {puts ("Print statement");}
+      | INPUT identifier END_STMT   {puts ("Input statement");}
+      | if_statement                {puts ("If statement");}
+      | compound_statement          {puts ("Compound statement");}
+      | error END_STMT              {puts ("Error statement");}</Pre>
+       </Code>
+
+		As you can see, this defines all the types of statements our language has, with code next to it telling the parser what to do when it finds each alternative. I think this rule is pretty straightforward. One thing though: the "Error statement" tells Yacc what to do if it encounters a parse error (such as an illegal token or an non-fitting token) while parsing a statement. In this case it will look for the next END_STMT token and continue parsing after that. Parse errors are always reported to the yyerror() function defined in main.cpp so our compiler can deal with it in an appropriate way. If you don't supply an error rule anywhere in your .y file, your parser will stop when it finds a parsing error, which isn't very graceful.<Br>
+		<Br>
+
+		Perhaps you're wondering why there are so many different expression rules: expression, equal_expression, assign_expression, concat_expression and simple_expression. This is to specify the precedence of the operators. If the parser sees this:<Br>
+		<Br>
+
+		<Code>
+<Pre>if (a == b + c)</Pre>
+		</Code>
+
+		it should know it shouldn't evaluate a==b and then try to add the boolean result of this to the string variable c. The different expression rules make sure there's only one way to parse this statement. Just look at it for a while; it works.<Br>
+		<Br>
+
+		Another problem is parsing the following statement:<Br>
+		<Br>
+
+		<Code>
+<Pre>if (a == b)   if (c == d)   e = f;   else g = h;</Pre>
+		</Code>
+
+		The parser doesn't know to which if-statement (the inner or outer if) the else belongs; it could think you meant<Br>
+		<Br>
+
+		<Code>
+<Pre>if (a == b)   {if (c == d)   e = f;}   else g = h;</Pre>
+		</Code>
+
+		but the convention in all imperative languages is to group the else with the inner if.<Br>
+		<Br>
+
+		Since there is no way to solve this by changing your rules, Yacc would report a shift/reduce conflict. This conflict is simply suppressed by adding the line<Br>
+		<Br>
+
+		<Code>
+<Pre>%expect 1</Pre>
+		</Code>
+
+		to the definitions section, meaning Yacc should expect 1 conflict. Yacc will "solve" this conflict by associating the else with the nearest if, just like we want. That's just the default solution to any conflicts it finds.<Br>
+		<Br>
+
+		The rest of the Yacc file is pretty self-explanatory once you understand BNF. If there's anything left that's unclear, you can always mail me about it or post a question on the messageboard.<Br>
+		<Br>
+
+		This Yacc input file can be compiled using the command:<Br>
+		<Br>
+
+		<Code>
+<Pre>bison --defines --verbose -o parse.cpp</Pre>
+		</Code>
+
+		If you get any conflicts, look at the file parse.cpp.output which contains details about the conflict (even if you don't get errors it's an interesting file to look at). If you run into any conflicts you can't solve, just send me your .y file and I'll have a look at it.<Br>
+		<Br>
+
+		If everything went OK (it should do so with the sample code) you get a working lexer in the file parse.cpp. All our new main program does is call the yyparse() function and the whole input file will be sliced & diced for us!<Br>
+		<Br>
+
+		Try example.str again and watch the error it produces. Error? Yes, that's right, I forgot one ';' at the end of line 13. But hey, it works! Great huh?<Br>
+		<Br>
+
+		<H3>Whew!</H3>
+
+		That was quite a lot we did today. We learned some formal language theory, how to use it in Yacc, why Yacc is so picky about which grammars it supports, and how to specificy operator precedence. And finally, we made a working parser!<Br>
+		<Br>
+
+		Well, I think the hardest part is actually behind us. If you understand this, the rest will be a piece of cake. However, if I've lost you somewhere while ranting about LR(1) grammars, post on the messageboard or mail me so I can try to clarify things! Any other questions or comments are also welcome, if only so I know people are actually reading this stuff (okay, I believe Kurt at least skims over it while converting to HTML ;-)<Br>
+		<Br>
+
+		Now, what lies in the future? Next time we'll probably write TWO new components: the symbol table and the syntax tree. Until then, you have a week to experiment with the code. Tip: try to get the compiler to accept C-style while statements!<Br>
+		<Br>
+
+		<HR Width=100%>
+		<Br>
+
+		<A HRef="page_4.html">Next: <I>The Symbol Table & Syntax Tree</I></A><Br>
+		<A HRef="page_2.html">Prev: <I>The Lexical Analyzer</I></A>
+
+		</P>
+
+	</Body>
+
+</HTML>

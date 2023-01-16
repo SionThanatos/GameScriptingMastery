@@ -1,0 +1,128 @@
+<HTML>
+
+	<Head>
+		<Title>
+			Between a Rock and a Hard Fan Base: Designing a Mod-Friendly Game
+		</Title>
+		<Link Rel="Stylesheet" Type="text/css" HRef="article.css">
+	</Head>
+
+	<Body>
+
+		<Center>
+
+		<Table Width=640 CellSpacing=0 CellPadding=0 Border=0>
+			<TR>
+				<TD>
+					<P>
+
+					<Center>
+					<H1>Between a Rock and a Hard Fan Base:<Br>
+					Designing a Mod-Friendly Game</H1>
+					<I>Relic Entertainment's Falko Poiker, of Homeworld fame, speaks about the intricate process of designing mod friendly games.</I><Br>
+					<Br>
+					<B><I>by Falko Poiker</I></B>
+					</Center>
+					<Br>
+
+					<H3>Introduction</H3>
+
+					<Div>
+					<Img Src="homeworld_0.jpg" Width=200 Height=150 Alt="Homeworld" Align=Left Border=10>
+
+					Last year, when Relic released <I>Homeworld</I> to the masses, we were quickly lambasted by a segment of our fans for making the game very difficult to modify. Nowadays, many popular games are put together with various hooks to allow the more hardcore fans to create mods for the game. Mods increase the longevity of a game by allowing fans to create variations that keep the game fresh, and every now and then produce spin off games that are almost as popular, if not more popular, than the original game. <I>The Counter-Strike</I> mod for <I>Half-Life</I> is the most obvious example of a popular spin off of a popular game.<Br>
+					<Br>
+
+					It was not our intention to hinder modders, it was simply difficult enough for us to create <I>Homeworld</I>, let alone make it mod friendly. I think that very few ground-breaking games are mod friendly -- even <I>Doom</I>, the first ground breaking mod friendly game that I can think of, was the technical follow up to <I>Castle Wolfenstein</I>. Despite our lack of effort, our fans have surprised us again and again by cracking our code and creating amazing variations of <I>Homeworld</I>. As of this writing, there are 21 mods for <I>Homeworld</I> and <I>Cataclysm</I>, including two Star Trek mods, a Babylon 5 mod, a Battlestar Galactica mod, and a Star Wars mod.<Br>
+					<Br>
+
+					In making our new game (which I will call <I>The Game</I> from now on, since I cannot name it explicitly), the Homeworld team decided to create an engine from the ground up that will be modifiable in as many ways as possible. Making a mod friendly is not game overly hard, it just requires a commitment to do so from the beginning. Spending a year developing a game engine, then turning around and retrofitting modability into that engine is extremely difficult, if not impossible. Do it right from the start, and you're laughing.<Br>
+					<Br>
+
+					Since AI programmers don't normally have a heck of a lot to do at the beginning of a development cycle (aside from design), I took on the task of setting up the scripting system for <I>The Game</I>. The scripting system would be one of the major steps in making the game easy to modify. As such, choosing the right language, and embedding it properly into <I>The Game</I> was an important task. In this article, I'd like to talk about game scripting and hopefully give a bit of an insight into some of the things that go into developing a game.<Br>
+					<Br>
+					</Div><Br>
+					<Br>
+
+					<H3>What is Scripting?</H3>
+
+					<Div>
+					<Img Src="homeworld_1.jpg" Width=200 Height=150 Alt="Homeworld" Align=Right Border=10>
+
+					The majority of games are programmed using a compiled language such as c++ or c. The games are written in text files by the programmers, then another program translates these text files into very efficient (but nearly impossible to read) machine code that becomes the game's executable program. The computer doesn't have to read any text when it runs the game -- the entire game is in a format that it can understand.<Br>
+					<Br>
+
+					A scripting language, on the other hand, is read in and translated as the game runs. The computer has to read, translate and execute the script file all at once (and every time the game runs). A good number of scripting languages do special things to speed up the read/translate/execute cycle, but this is essentially how scripts get run. Since scripts are read every time the program runs, they are called "interpreted" languages (think of a foreign language interpreter -- he listens, the repeats what he heard in a different language -- this is what a scripting system does for the CPU when it reads a game script).<Br>
+					</Div><Br>
+					<Br>
+
+					<H3>Game Scripting</H3>
+
+					<Div>
+					<Img Src="homeworld_2.jpg" Width=200 Height=150 Alt="Homeworld" Align=Left Border=10>
+
+					Scripting isn't only good for modability, it helps development as well -- even if the game developers have no intention of exposing the scripts to the public, those same developers would benefit greatly from building a good scripting system into their game. Scripts help make a game more data driven: instead of game properties and behaviors being hard coded into the game engine, scripts are used to define and modify those properties and behaviors. As a result, designers and artists can tweak how the game looks or works without needing to touch the executable itself. This is nothing new, but a surprising number of games still have many hard coded properties that could be put into scripts.<Br>
+					<Br>
+
+					What a script does depends entirely on how it's implemented. Scripts can define the colors of objects in the game, what objects go in the game, how those objects behave, even how the game's artificial intelligence behaves. Some games even use scripts for their save game files. <I>Homeworld</I> had scripts that defined the game's default values (and there were many: colors, camera properties, ship flight dynamic properties, among others), and also had a scripting language for the single player AI, but the latter language was compiled into the game, so it wasn't visible to modders.<Br>
+					<Br>
+					</Div>
+
+					<H3>Scripting Languages</H3>
+
+					<Div>
+					<Img Src="homeworld_3.jpg" Width=200 Height=150 Alt="Homeworld" Align=Right Border=10>
+
+					There are two paths to choose when creating a scripting system in a game. Either a proprietary language can be created and built from the ground up within the game -- Unreal Script is a good example of one of these -- or a publicly available scripting language can be embedded into the game engine. The Homeworld team realized that we had neither the manpower, nor the expertise to create a brand new language, so we decided to use a publicly available one. There are many scripting languages available: Perl, Python and lua are some examples, but there are many others. We spent a good amount of time researching the different languages available to us before deciding on lua.<Br>
+					<Br>
+
+					A scripting language for our game had to meet certain specific requirements.<Br>
+					<Br>
+
+					<UL>
+					<LI>
+					<B>Ease of Use:</B> The people who tend to work with scripts are designers and artists with little or no programming experience, so the scripting language should be relatively simple to use. This isn't so important for modability however, since most modders are good programmers. This requirement ruled out Perl, as it's syntax is extremely difficult to grasp for non-programmers (and even some programmers).
+					</LI>
+					<LI>
+					<B>Speed:</B> Games push the envelope in speed already, so a scripting language cannot be the weak link in the chain. We developers spend many hours trying to eke out performance out of our engines, so a scripting language that is slow is simply unacceptable because there's usually very little the game programmers can do to increase the performance of a slow scripting language. Most publicly available scripting languages are designed to be fast (though none are as fast as a compiled language like c++).
+					</LI>
+					<LI>
+					<B>Size:</B> Computer game executables tend to be bloated as they are. Adding a scripting system shouldn't increase the size of the executable by a whole lot. Lua is super small, so it was the ideal choice here -- it's tiny (the executable is 160 kb).
+					</LI>
+					<LI>
+					<B>Well Documented:</B> The more we know about a language, the better we can use all the features it has to offer. This is one of the downsides of lua, it's only documentation is it's reference manual, which though complete, is too short. Lua's code is also very sparsely documented, so it's hard to look into and analyze. Python would have been the better choice in this respect.
+					</LI>
+					<LI>
+					<B>Flexibility:</B> The more flexible a language is, the more we can modify the scripting language to work together with the specific demands of The Game, the more useful it will be to us and the mod groups. Lua has a very clean and flexible interface, so it was easily customized to our needs.
+					</LI>
+					</UL>
+
+					</Div>
+
+					<H3>Scripting and AI</H3>
+
+					<Div>
+					<Img Src="homeworld_4.jpg" Width=200 Height=150 Alt="Homeworld" Align=Left Border=10>
+
+					Since my specialty here at Relic is Artificial Intelligence, the most interesting aspect of scripting is what I can do with AI. The coolest feature of scripting stems from the fact that it is interpreted by the game, instead of compiled into its executable. While the game is running the AI scripts can be changed, and the game will react as soon as it reloads the changes. I'll literally be able to create the AI in the game while the game shows me instantly how changes I make affect the AI behavior. With an AI that's compiled into the game's executable (like <I>Homeworld</I>'s computer and single-player games), every time a change is made the executable needs to be rebuilt, the game restarted, and replayed to a point where the AI uses the feature that we changed. This can take up a lot of time.<Br>
+					<Br>
+ 					</Div>
+
+					<H3>Have Scripts, Will Travel</H3>
+
+					<Div>
+					<Img Src="homeworld_5.jpg" Width=200 Height=150 Alt="Homeworld" Align=Right Border=10>
+
+					Scripts alone will not make <I>The Game</I> a hit among the modding communities, but we hope that they (along with a few other fundamental designs we're implementing) will go a long way towards making <I>The Game</I> a joy for a wider range of people, including those who take pleasure in toying with <I>The Game</I>, rather than playing it.</Div><Br>
+					<Br>
+
+					</P>
+				</TD>
+			</TR>
+		</Table>
+
+		</Center>
+
+	</Body>
+
+</HTML>

@@ -1,0 +1,8 @@
+﻿  console.cpp
+  xvm.cpp
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\XscriptSystem\XVMConsole\xvm.cpp(1369,107): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  正在生成代码
+  Previous IPDB not found, fall back to full compilation.
+  All 44 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  已完成代码的生成
+  XVMConsole.vcxproj -> C:\Users\ZAI\Desktop\GameScriptingMastery-master\XscriptSystem\x64\Release\XVMConsole.exe

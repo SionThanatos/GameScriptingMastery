@@ -1,0 +1,4 @@
+﻿  test.cpp
+C:\Users\ZAI\Desktop\GameScriptingMastery-master\Programs\Chapter 6\Python\Basic Demo\Cpyhon\Cpyhon\test.cpp(1,1): warning C4828: 文件包含在偏移 0xd0 处开始的字符，该字符在当前源字符集中无效(代码页 936)。
+    正在创建库 C:\Users\ZAI\Desktop\GameScriptingMastery-master\Programs\Chapter 6\Python\Basic Demo\Cpyhon\x64\Debug\Cpyhon.lib 和对象 C:\Users\ZAI\Desktop\GameScriptingMastery-master\Programs\Chapter 6\Python\Basic Demo\Cpyhon\x64\Debug\Cpyhon.exp
+  Cpyhon.vcxproj -> C:\Users\ZAI\Desktop\GameScriptingMastery-master\Programs\Chapter 6\Python\Basic Demo\Cpyhon\x64\Debug\Cpyhon.dll

@@ -1,0 +1,5 @@
+host PrintString ();
+func _Main ()
+{
+	PrintString("hello test");
+}

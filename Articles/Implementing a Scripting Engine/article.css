@@ -1,0 +1,37 @@
+Body
+{
+	Background-Color: #000000;
+	Font-Family: Arial, Helvetica, Sans-Serif;
+	Font-Size: 9pt;
+	Color: #FFFFFF;
+}
+
+P
+{
+	Font-Size: 10Pt;
+}
+
+A:Link
+{
+	Color: #FFF099;
+	Font-Weight: Bold;
+}
+
+A:Visited
+{
+	Color: #CCC044;
+	Font-Weight: Bold;
+}
+
+A:Active
+{
+	Color: #CCC0FF;
+	Font-Weight: Bold;
+}
+
+Code
+{
+	Font-Family: Courier New, Courier, Monospace;
+	Color: #CCC0FF;
+	Font-Size: 10Pt;
+}
